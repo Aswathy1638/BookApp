@@ -2,31 +2,45 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using BookApp.Models;
 
-namespace BookstoreAPI.Controllers
+namespace BookApp.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/books")]
     [ApiController]
-    public class BooksController : ControllerBase
+    public class BookController : ControllerBase
     {
-        private static List<TodoItemBook> _books = new List<TodoItemBook>()
+        /* private static List<TodoItemBook> _books = new List<TodoItemBook>()
+         {
+             new TodoItemBook { Id = 1, Title = "Book 1", Author = "Author 1", Genre = "Genre 1", Price = 10.99m },
+             new TodoItemBook { Id = 2, Title = "Book 2", Author = "Author 2", Genre = "Genre 2", Price = 12.99m },
+             new TodoItemBook { Id = 3, Title = "Book 3", Author = "Author 3", Genre = "Genre 3", Price = 9.99m }
+         };*/
+        private readonly ToDoContext _context;
+
+        public BookController(ToDoContext context)
         {
-            new TodoItemBook { Id = 1, Title = "Book 1", Author = "Author 1", Genre = "Genre 1", Price = 10.99m },
-            new TodoItemBook { Id = 2, Title = "Book 2", Author = "Author 2", Genre = "Genre 2", Price = 12.99m },
-            new TodoItemBook { Id = 3, Title = "Book 3", Author = "Author 3", Genre = "Genre 3", Price = 9.99m }
-        };
+            _context = context;
+        }
+
 
         // GET /api/books
-        [HttpGet]
+        /*[HttpGet]
         public ActionResult<IEnumerable<TodoItemBook>> GetBooks()
         {
             return Ok(_books);
+        }*/
+        [HttpGet]
+        public IActionResult GetBooks()
+        {
+            var books = _context.TodoItemBooks.ToList();
+            return Ok(books);
         }
+
 
         // GET /api/books/{id}
         [HttpGet("{id}")]
-        public ActionResult<TodoItemBook> GetBook(int id)
+        public IActionResult GetBook(int id)
         {
-            var book = _books.Find(b => b.Id == id);
+            var book = _context.TodoItemBooks.Find(id);
             if (book == null)
             {
                 return NotFound();
@@ -34,42 +48,55 @@ namespace BookstoreAPI.Controllers
             return Ok(book);
         }
 
+
         // POST /api/books
-        [HttpPost]
-        public ActionResult<TodoItemBook> AddBook(TodoItemBook book)
+         [HttpPost]
+        public IActionResult AddBook(TodoItemBook book)
         {
-            book.Id = _books.Count + 1;
-            _books.Add(book);
-            return CreatedAtAction(nameof(GetBook), new { id = book.Id }, book);
+            if (string.IsNullOrWhiteSpace(book.Title) || string.IsNullOrWhiteSpace(book.Author) || string.IsNullOrWhiteSpace(book.Genre))
+            {
+                return BadRequest("Invalid data for a new book");
+            }
+
+            _context.TodoItemBooks.Add(book);
+            _context.SaveChanges();
+            return CreatedAtAction(nameof(GetBook), new { id = book.Id}, book);
         }
 
         // PUT /api/books/{id}
         [HttpPut("{id}")]
         public IActionResult UpdateBook(int id, TodoItemBook updatedBook)
         {
-            var book = _books.Find(b => b.Id == id);
+            var book = _context.TodoItemBooks.Find(id);
             if (book == null)
             {
                 return NotFound();
             }
+
             book.Title = updatedBook.Title;
             book.Author = updatedBook.Author;
             book.Genre = updatedBook.Genre;
             book.Price = updatedBook.Price;
+
+            _context.SaveChanges();
             return NoContent();
         }
+
 
         // DELETE /api/books/{id}
         [HttpDelete("{id}")]
         public IActionResult DeleteBook(int id)
         {
-            var book = _books.Find(b => b.Id == id);
+            var book = _context.TodoItemBooks.Find(id);
             if (book == null)
             {
                 return NotFound();
             }
-            _books.Remove(book);
+
+            _context.TodoItemBooks.Remove(book);
+            _context.SaveChanges();
             return NoContent();
         }
+
     }
 }

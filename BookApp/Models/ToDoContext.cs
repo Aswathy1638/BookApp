@@ -6,6 +6,6 @@ namespace BookApp.Models
     {
      public ToDoContext(DbContextOptions<ToDoContext> options) : base(options) 
         { }
-        public DbSet<TodoItemBook> TodoItems { get; set; }
+        public DbSet<TodoItemBook> TodoItemBooks { get; set; }
     }
 }
