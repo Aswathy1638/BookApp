@@ -1,6 +1,8 @@
 
 using BookApp.Models;
+using FluentAssertions.Common;
 using Microsoft.EntityFrameworkCore;
+using System.Configuration;
 
 namespace BookApp
 {
@@ -18,6 +20,9 @@ namespace BookApp
     opt.UseInMemoryDatabase("TodoList"));
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+            Services.AddDbContext<ToDoContext>(options =>
+    options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+
 
             var app = builder.Build();
 
