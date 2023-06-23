@@ -1,6 +1,9 @@
 
 using BookApp.Models;
+using FluentAssertions.Common;
 using Microsoft.EntityFrameworkCore;
+using System.Configuration;
+using BookApp.Models;
 
 namespace BookApp
 {
@@ -18,7 +21,6 @@ namespace BookApp
     opt.UseInMemoryDatabase("TodoList"));
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
-
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
